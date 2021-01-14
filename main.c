@@ -20,7 +20,7 @@ void help() {
 int main() {
 
     while (1) {
-
+        //test
         char userInput[100];
         scanf("%[^\n]%*c", userInput);
         char *separation = strtok(userInput, " ");
