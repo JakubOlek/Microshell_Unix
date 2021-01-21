@@ -17,7 +17,6 @@
 #define Red "\x1b[31m"
 #define Reset "\033[0m"
 
-
 void nextLine() {
     printf("\n");
 }
