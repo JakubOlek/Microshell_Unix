@@ -20,42 +20,51 @@ void nextLine() {
     printf("\n");
 }
 
-void help() {
-    printf(Purple);
-    printf("*** MicroShell SOP ***"), nextLine();
-    printf(Yeelow);
-    printf("Author: "), printf(Green);
+void executeHelp() {
+    nextLine();
+    printf(""Purple"*** MicroShell SOP ***"), nextLine();
+    printf(""Yeelow"Author: "), printf(Green);
     printf("Jakub Olek"), nextLine();
-    printf(Red);
-    printf("My functions: "), nextLine();
-    printf(Cyan);
-    printf("help"), nextLine();
+    printf(""Red"My functions: "), nextLine();
+    printf(""Cyan"help"), nextLine();
     printf("cd"), nextLine();
     printf("pwd"), nextLine();
     printf("mkdir"), nextLine();
     printf("history"), nextLine();
     printf("clear"), nextLine();
     printf("exit"), nextLine();
-    printf(Reset);
+    nextLine();
 }
 
-void cdPrint(char **userCommand) {
-    if (userCommand[1] == NULL) {
+void executeCd(char **userCommand) {
+    if (userCommand[1] == NULL || strcmp(userCommand[1], "~") == 0) {
         chdir(getenv("HOME"));
-    } else if (strcmp(userCommand[1], "~") == 0) {
-        chdir(getenv("HOME"));
-    } else if (chdir(userCommand[1]) == 0) {
     } else if (chdir(userCommand[1]) != 0) {
         printf("cd: %s: No such file or directory", userCommand[1]), nextLine();
     }
 }
 
-void mkdirPrint(char **userCommand) {
+void executeMkdir(char **userCommand) {
     if (mkdir(userCommand[1], 0777) == 0) {
         printf("mkdir : directory ‘%s’ created", userCommand[1]), nextLine();
     } else {
         printf("mkdir : cannot create directory ‘%s’: File exists", userCommand[1]), nextLine();
     }
+}
+
+void executeHistory(char commandHistory[historySize][inputSize], int historyCounter) {
+    int j;
+    for (j = 0; j < historyCounter; j++) {
+        printf("%d  %s", j + 1, commandHistory[j]), nextLine();
+    }
+}
+
+void executePwd(char userInput[inputSize]) {
+    printf("%s", getcwd(userInput, inputSize)), nextLine();
+}
+
+void printUserPath(char userInput[inputSize]) {
+    printf(""Green"[%s:"Blue"%s]"Reset"\n$ ", getenv("USER"), getcwd(userInput, inputSize));
 }
 
 int main() {
@@ -65,10 +74,10 @@ int main() {
     char userInput[inputSize];
 
     while (1) {
-        printf(""Green"[%s:"Blue"%s]"Reset"\n$ ", getenv("USER"), getcwd(userInput, inputSize));
+        printUserPath(userInput);
         scanf(" %[^\n]%*c", userInput);
-
         strcpy(commandHistory[historyCounter++], userInput);
+
         char *separation = strtok(userInput, " ");
         char *userCommand[sizeof(userInput)] = {0};
         int index = 0;
@@ -78,35 +87,23 @@ int main() {
         }
 
         if (strcmp(userCommand[0], "help") == 0) {
-            nextLine(), help(), nextLine();
+            executeHelp();
         } else if (strcmp(userCommand[0], "history") == 0) {
-            int j;
-            for (j = 0; j < historyCounter; j++) {
-                printf("%d  %s", j + 1, commandHistory[j]), nextLine();
-            }
+            executeHistory(commandHistory, historyCounter);
         } else if (strcmp(userCommand[0], "cd") == 0) {
-            cdPrint(userCommand);
+            executeCd(userCommand);
         } else if (strcmp(userCommand[0], "pwd") == 0) {
-            printf("%s", getcwd(userInput, inputSize)), nextLine();
+            executePwd(userInput);
         } else if (strcmp(userCommand[0], "exit") == 0) {
             exit(0);
         } else if (strcmp(userCommand[0], "mkdir") == 0) {
-            mkdirPrint(userCommand);
+            executeMkdir(userCommand);
         } else if (strcmp(userCommand[0], "clear") == 0) {
             clear();
         } else {
-            char tempArgs[sizeof(userInput)] = {0};
-            int i;
-            for (i = 1; userCommand[i] != (void *) 0; i++) {
-                if (i > 1) {
-                    strcat(tempArgs, " ");
-                }
-                strcat(tempArgs, userCommand[i]);
-            }
-            char *arguments[] = {userCommand[0], tempArgs, NULL};
             int pid = fork();
             if (pid == 0) {
-                if (execvp(userCommand[0], arguments) != 0) {
+                if (execvp(userCommand[0], userCommand) != 0) {
                     printf("Command `%s` not found.", userCommand[0]), nextLine();
                 }
             } else {
