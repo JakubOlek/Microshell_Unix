@@ -105,6 +105,7 @@ int main() {
             if (pid == 0) {
                 if (execvp(userCommand[0], userCommand) != 0) {
                     printf("Command `%s` not found.", userCommand[0]), nextLine();
+                    exit(0);
                 }
             } else {
                 wait(NULL);
