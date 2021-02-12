@@ -23,8 +23,8 @@ void nextLine() {
 void executeHelp() {
     nextLine();
     printf(""Purple"*** MicroShell SOP ***"), nextLine();
-    printf(""Yeelow"Author: "), printf(Green);
-    printf("Jakub Olek"), nextLine();
+    printf(""Yeelow"Author: ");
+    printf(""Green"Jakub Olek"), nextLine();
     printf(""Red"My functions: "), nextLine();
     printf(""Cyan"help"), nextLine();
     printf("cd"), nextLine();
